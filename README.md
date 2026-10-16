@@ -55,8 +55,8 @@ cy  -3,1,0     -0.5,0,0.5   2     3       255,255,255
 | `0_bad/` | invalid files that must be rejected (bad values, missing elements, wrong extension, empty file) |
 | `1_basic/` | each primitive on its own, including horizontal and tilted cylinders |
 | `2_light/` | light from front, back, side, top and quarter angles |
-| `3_ambient/` | ambient-only versus light-only lighting |
-| `4_multi/` | several objects and colored lights |
+| `3_ambient/` | ambient and light intensity at 0 versus 1, with colored light |
+| `4_multi/` | several objects, multiple cylinders, colored ambient light |
 | `5_perspective/` | FOV changes, camera rotation, moving lights |
 | `6_intersect/` | intersecting objects and closed rooms |
 | `7_fun/` | composed scenes: `atoms`, `monster`, `scifi`, `western` |
