@@ -1,0 +1,7 @@
+/miniRT
+.build/
+/minilibx-linux
+*.o
+*.d
+*.swp
+a.out

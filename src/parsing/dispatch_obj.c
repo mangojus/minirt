@@ -1,0 +1,103 @@
+#include "minirt.h"
+
+static void	add_obj_to_scene(t_scene *s, t_obj *o)
+{
+	t_obj	*tmp;
+
+	o->next = NULL;
+	if (!s->objs)
+		s->objs = o;
+	else
+	{
+		tmp = s->objs;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = o;
+	}
+	if (o->type == SPHERE)
+		s->sp = o;
+	else if (o->type == PLANE)
+		s->pl = o;
+	else
+		s->cy = o;
+}
+
+static bool	dispatch_sp(char **tab, t_scene *s, t_coords *c, t_data *data)
+{
+	t_obj	*new_sp;
+
+	c->coords = check_coords(tab[1], data);
+	c->coords_r = check_coords_range(tab[3], 0, 255, data);
+	if (!c->coords || !ft_isnumber(tab[2])
+		|| ft_atof(tab[2]) < 0 || !c->coords_r)
+		return (ret_error(data, ERR_INVALID_SPHERE_DATA));
+	new_sp = create_sp(parse_vector(c->coords, 1, data), ft_atof(tab[2]),
+			parse_vector(c->coords_r, 3, data));
+	if (!new_sp)
+		return (ret_error(data, ERR_MALLOC_SPHERE));
+	add_obj_to_scene(s, new_sp);
+	return (true);
+}
+
+static bool	dispatch_pl(char **tab, t_scene *s, t_coords *c, t_data *data)
+{
+	t_obj	*new_pl;
+
+	c->coords = check_coords(tab[1], data);
+	c->coords_r = check_coords_range(tab[2], -1, 1, data);
+	c->coords_r2 = check_coords_range(tab[3], 0, 255, data);
+	if (!c->coords || !c->coords_r || !c->coords_r2)
+		return (ret_error(data, ERR_INVALID_PLANE_DATA));
+	new_pl = create_pl(parse_vector(c->coords, 1, data),
+			parse_vector(c->coords_r, 2, data),
+			parse_vector(c->coords_r2, 3, data));
+	if (!new_pl)
+		return (ret_error(data, ERR_MALLOC_PLANE));
+	add_obj_to_scene(s, new_pl);
+	return (true);
+}
+
+static bool	dispatch_cy(char **tab, t_scene *s, t_coords *c, t_data *data)
+{
+	t_obj	*new_cy;
+	t_dim	dim;
+
+	c->coords = check_coords(tab[1], data);
+	c->coords_r = check_coords_range(tab[2], -1, 1, data);
+	c->coords_r2 = check_coords_range(tab[5], 0, 255, data);
+	if (!c->coords || !c->coords_r || !ft_isnumber(tab[3])
+		|| ft_atof(tab[3]) < 0 || !ft_isnumber(tab[4])
+		|| ft_atof(tab[4]) < 0 || !c->coords_r2)
+		return (ret_error(data, ERR_INVALID_CYLINDER_DATA));
+	dim.d = ft_atof(tab[3]);
+	dim.h = ft_atof(tab[4]);
+	new_cy = create_cy(parse_vector(c->coords, 1, data),
+			parse_vector(c->coords_r, 2, data), dim,
+			parse_vector(c->coords_r2, 3, data));
+	if (!new_cy)
+		return (ret_error(data, ERR_MALLOC_CYLINDER));
+	add_obj_to_scene(s, new_cy);
+	return (true);
+}
+
+bool	dispatch_obj(char **tab, t_scene *s, t_data *data)
+{
+	t_coords	c;
+	bool		res;
+
+	ft_memset(&c, 0, sizeof(t_coords));
+	res = true;
+	if (ft_strcmp(tab[0], "sp") == 0)
+		res = dispatch_sp(tab, s, &c, data);
+	else if (ft_strcmp(tab[0], "pl") == 0)
+		res = dispatch_pl(tab, s, &c, data);
+	else if (ft_strcmp(tab[0], "cy") == 0)
+		res = dispatch_cy(tab, s, &c, data);
+	else
+	{
+		data->error = ERR_INVALID_ID;
+		res = false;
+	}
+	free_tabs(c.coords, c.coords_r, c.coords_r2);
+	return (res);
+}

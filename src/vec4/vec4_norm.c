@@ -1,0 +1,21 @@
+#include "vec4.h"
+
+// use case : normalize vector (len = 1 && 0 >= x/y/z <= 1)
+
+t_vec4	vec4_norm(t_vec4 vec)
+{
+	t_vec4	res;
+	float	len;
+
+	len = vec4_len(vec);
+	if (len == 0)
+	{
+		res.x = 0;
+		res.y = 0;
+		res.z = 0;
+		res.w = vec.w;
+	}
+	else
+		res = vec4_scalar_div(vec, len);
+	return (res);
+}
